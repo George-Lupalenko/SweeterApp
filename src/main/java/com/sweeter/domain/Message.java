@@ -1,13 +1,21 @@
 package com.sweeter.domain;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @NotBlank(message = "Please enter any message")
+    @Length(max = 2048 ,message = "Message too long (more then 2k)")
     private String text;
+    @NotBlank(message = "Please enter any message")
+    @Length(max = 255 ,message = "Tag too long (more then 255)")
     private String tag;
     private String filename;
 
