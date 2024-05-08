@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,13 +20,14 @@ import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Controller
 public class MainController {
-    @Value("${upload.path}")
+    @Value("${upload.path")
     private String uploadPath;
     @Autowired
     private MessageRepository messageRepository;
@@ -64,18 +66,7 @@ public class MainController {
             model.mergeAttributes(errorMap);
             model.addAttribute("message", message);
         }else {
-            if (file != null && !file.getOriginalFilename().isEmpty()) {
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdir();
-                }
-                String uuidFile = UUID.randomUUID().toString();
-                String resultFileName = uuidFile + " " + file.getOriginalFilename();
-
-                file.transferTo(new File(uploadPath + "/" + resultFileName));
-
-                message.setFilename(resultFileName);
-            }
+            saveFile(message, file , uploadPath );
             model.addAttribute("message" , null);
             messageRepository.save(message);
         }
@@ -84,5 +75,20 @@ public class MainController {
         model.addAttribute("messages", messages);
 
         return "main";
+    }
+
+    protected static void saveFile(Message message, MultipartFile file ,String uploadPath) throws IOException {
+        if (file != null && !file.getOriginalFilename().isEmpty()) {
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            }
+            String uuidFile = UUID.randomUUID().toString();
+            String resultFileName = uuidFile + " " + file.getOriginalFilename();
+
+            file.transferTo(new File(uploadPath + "/" + resultFileName));
+
+            message.setFilename(resultFileName);
+        }
     }
 }
