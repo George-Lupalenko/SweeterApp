@@ -10,10 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/user")
@@ -36,25 +33,18 @@ public class UserController {
     }
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String userSave(
+    public String procesingUserInput(
+            @RequestParam String action,
             @RequestParam String username,
             @RequestParam Map<String , String> form,
-            @RequestParam("userId") User user){
-        user.setUsername(username);
-
-        Set<String> roles =  Arrays.stream(Role.values())
-                .map(Role::name)
-                .collect(Collectors.toSet());
-
-        user.getRoles().clear();
-
-        for(String key : form.keySet()){
-            if(roles.contains(key)){
-                user.getRoles().add(Role.valueOf(key));
-            }
+            @RequestParam("userId") User user
+    ){
+        if (action.equals("save")) {
+            userService.saveUser(user , username ,form);
+        } else if (action.equals("delete")) {
+            userService.deleteUser(user);
         }
 
-        userService.saveUser(user , username ,form);
         return "redirect:/user";
     }
     @GetMapping("profile")

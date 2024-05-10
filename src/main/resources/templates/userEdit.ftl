@@ -12,7 +12,8 @@
         </#list>
         <input type="hidden" value="${user.id}" name="userId">
         <input type="hidden" value="${_csrf.token}" name="_csrf">
-        <button type="submit" class="btn btn-dark mr-5">Save</button>
-        <button type="submit" class="btn btn-dark mr-5">Delete</button>
+        <button type="submit" class="btn btn-dark mr-5" name="action" value="save">Save</button>
+        <button type="submit" class="btn btn-dark mr-5" name="action" value="delete">Delete</button>
     </form>
+    
 </@c.page>

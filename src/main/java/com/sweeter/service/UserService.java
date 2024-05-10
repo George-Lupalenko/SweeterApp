@@ -114,6 +114,9 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user);
     }
+    public void deleteUser(User user){
+        userRepository.delete(user);
+    }
 
     public void updateProfile(User user, String password, String email) {
         String userEmail = user.getEmail();
