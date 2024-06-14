@@ -5,30 +5,31 @@ import com.sweeter.domain.User;
 import com.sweeter.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 @Controller
 public class MainController {
     @Value("${upload.path")
     private String uploadPath;
+
     @Autowired
     private MessageRepository messageRepository;
 
@@ -38,16 +39,22 @@ public class MainController {
     }
 
     @GetMapping("/main")
-    public String main(@RequestParam(required = false ,defaultValue = "") String filter ,  Model model) {
-        Iterable<Message> messages = messageRepository.findAll();
+    public String main(
+            @RequestParam(required = false, defaultValue = "") String filter,
+            Model model,
+            @PageableDefault(sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<Message> page;
 
         if (filter != null && !filter.isEmpty()) {
-            messages = messageRepository.findByTag(filter);
+            page = messageRepository.findByTag(filter, pageable);
         } else {
-            messages = messageRepository.findAll();
+            page = messageRepository.findAll(pageable);
         }
-        model.addAttribute("messages", messages);
-        model.addAttribute("filter" , filter);
+
+        model.addAttribute("page", page);
+        model.addAttribute("url", "/main");
+        model.addAttribute("filter", filter);
 
         return "main";
     }
@@ -58,7 +65,8 @@ public class MainController {
             @Valid Message message,
             BindingResult bindingResult,
             Model model,
-            @RequestParam("file")MultipartFile file
+            @RequestParam("file")MultipartFile file,
+            @PageableDefault(sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable
     ) throws IOException {
         message.setAuthor(user);
         if(bindingResult.hasErrors()){
@@ -70,9 +78,10 @@ public class MainController {
             model.addAttribute("message" , null);
             messageRepository.save(message);
         }
-        Iterable<Message> messages = messageRepository.findAll();
+        Page<Message> page = messageRepository.findAll(pageable);
 
-        model.addAttribute("messages", messages);
+        model.addAttribute("page", page);
+        model.addAttribute("url", "/main");
 
         return "main";
     }
