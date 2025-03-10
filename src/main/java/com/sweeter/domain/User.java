@@ -2,7 +2,6 @@ package com.sweeter.domain;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
 
 import javax.persistence.*;
 import java.util.Collection;

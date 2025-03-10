@@ -1,16 +1,18 @@
 package com.sweeter.domain;
 
+
+
 import javax.persistence.*;
 
 @Entity
 public class Message {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "message_seq")
+    @SequenceGenerator(name = "message_seq", sequenceName = "message_seq", allocationSize = 1)
     private Long id;
     private String text;
     private String tag;
     private String filename;
-
 
 
     @ManyToOne(fetch = FetchType.EAGER)
